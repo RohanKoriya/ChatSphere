@@ -25,7 +25,9 @@ function ChatsList() {
           onClick={() => setSelectedUser(chat)}
         >
           <div className="flex items-center gap-3">
-            <div className={`avatar online`}>
+            <div
+              className={`avatar ${onlineUsers.includes(chat._id) ? "online" : ""}`}
+            >
               <div className="rounded-full size-12">
                 <img
                   src={chat.profilePic || "/avatar.png"}
