@@ -5,15 +5,45 @@ import ChatHeader from "./ChatHeader";
 import NoChatHistoryPlaceholder from "./NoChatHistoryPlaceholder";
 import MessageInput from "./MessageInput";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
+import { Download } from "lucide-react";
 
 function ChatContainer() {
-  const { selectedUser, getMessagesByUserId, messages, isMessagesLoading } =
-    useChatStore();
+  const {
+    selectedUser,
+    getMessagesByUserId,
+    messages,
+    isMessagesLoading,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
+  const handleDownload = (e, imageUrl) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    fetch(imageUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "image";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      });
+  };
+
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
+
+    subscribeToMessages();
+
+    // clean up
+    return () => unsubscribeFromMessages();
   }, [selectedUser, getMessagesByUserId]);
 
   useEffect(() => {
@@ -41,12 +71,32 @@ function ChatContainer() {
                   }`}
                 >
                   {msg.image && (
-                    <img
-                      src={msg.image}
-                      alt="Shared"
-                      className="object-cover h-48 rounded-lg"
-                    />
+                    <div className="relative mt-2 group">
+                      {/* IMAGE – opens in new tab */}
+                      <a
+                        href={msg.image}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img
+                          src={msg.image}
+                          alt="Shared"
+                          className="object-cover h-48 rounded-lg cursor-pointer"
+                          draggable="false"
+                        />
+                      </a>
+
+                      {/* DOWNLOAD BUTTON (hover only, no navigation) */}
+                      <button
+                        onClick={(e) => handleDownload(e, msg.image)}
+                        className="absolute p-2 transition-all duration-200 scale-90 rounded-full opacity-0  bottom-2 right-2 bg-black/60 hover:bg-black/80 group-hover:opacity-100 group-hover:scale-100"
+                        title="Download image"
+                      >
+                        <Download className="w-4 h-4 text-white" />
+                      </button>
+                    </div>
                   )}
+
                   {msg.text && <p className="mt-2">{msg.text}</p>}
                   <p className="flex items-center gap-1 mt-1 text-xs opacity-75">
                     {new Date(msg.createdAt).toLocaleTimeString(undefined, {
