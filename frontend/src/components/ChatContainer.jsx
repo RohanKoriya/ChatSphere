@@ -89,7 +89,7 @@ function ChatContainer() {
                       {/* DOWNLOAD BUTTON (hover only, no navigation) */}
                       <button
                         onClick={(e) => handleDownload(e, msg.image)}
-                        className="absolute p-2 transition-all duration-200 scale-90 rounded-full opacity-0  bottom-2 right-2 bg-black/60 hover:bg-black/80 group-hover:opacity-100 group-hover:scale-100"
+                        className="absolute p-2 transition-all duration-200 scale-90 rounded-full opacity-0 bottom-2 right-2 bg-black/60 hover:bg-black/80 group-hover:opacity-100 group-hover:scale-100"
                         title="Download image"
                       >
                         <Download className="w-4 h-4 text-white" />
